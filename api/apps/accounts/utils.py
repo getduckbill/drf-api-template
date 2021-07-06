@@ -3,7 +3,6 @@ import uuid
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from ...exceptions import InternalServerError, NotFound, VerificationFailed
-from ..shares.models import Share
 from .models import VerificationToken
 from .serializers import UserSerializer
 
@@ -56,9 +55,6 @@ def create_user(data):
 
     update_or_create_auth_token(user)
     update_or_create_verification_token(user)
-
-    for share in Share.objects.filter(recipient__email=user.email):
-        share.convert_to_user_deal()
 
     return user
 

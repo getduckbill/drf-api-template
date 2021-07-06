@@ -6,7 +6,6 @@ from ...exceptions import (
     NotFound,
     PermissionDenied
 )
-from ...sendgrid import add_contact
 from ...utils import validate_required_fields
 from .serializers import UserSerializer
 from .utils import (
@@ -57,29 +56,6 @@ class CreateUserView(generics.CreateAPIView):
         user = create_user(request.data)
 
         return get_logged_in_user_response(user, status=status.HTTP_201_CREATED)
-
-
-class WaitlistView(views.APIView):
-    """
-    View to sign up for the waitlist.
-
-    * No authentication.
-    * Requires email, first_name, last_name.
-    """
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request, *args, **kwargs):
-        email = request.data.get('email', '').strip().lower()
-        first_name = request.data.get('first_name', '')
-        last_name = request.data.get('last_name', '')
-        validate_required_fields({
-            'email': email,
-            'first_name': first_name,
-            'last_name': last_name,
-        })
-
-        add_contact(first_name, last_name, email)
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class RetrieveUserView(views.APIView):
