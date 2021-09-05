@@ -205,9 +205,12 @@ class ChangePasswordView(views.APIView):
             user.set_password(new_password)
             user.save()
 
-            token = update_or_create_auth_token(user)
+            update_or_create_auth_token(user)
 
-            return Response({'token': token.key})
+            return get_logged_in_user_response(
+                user,
+                status=status.HTTP_200_OK,
+            )
 
 
 class ChangeEmailView(views.APIView):
@@ -235,13 +238,16 @@ class ChangeEmailView(views.APIView):
         request.user.username = email
         request.user.is_verified = False
         request.user.save()
-        token = update_or_create_auth_token(request.user)
+        update_or_create_auth_token(request.user)
 
         verification_token = update_or_create_verification_token(request.user)
         # TODO: email verification
         print(verification_token)
 
-        return Response({'token': token.key, 'user': serializer.data})
+        return get_logged_in_user_response(
+            request.user,
+            status=status.HTTP_200_OK,
+        )
 
 
 class UpdateUserView(views.APIView):
@@ -261,4 +267,7 @@ class UpdateUserView(views.APIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'user': serializer.data})
+        return get_logged_in_user_response(
+            request.user,
+            status=status.HTTP_200_OK,
+        )
